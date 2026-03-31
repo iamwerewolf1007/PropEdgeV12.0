@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-PropEdge V10.0 — Master Orchestrator
+PropEdge V12.0 — Master Orchestrator
 ======================================
-Repo:       git@github.com:iamwerewolf1007/PropEdgeV10.0.git
-Working dir: ~/Documents/GitHub/PropEdgeV10.0
+Repo:       git@github.com:iamwerewolf1007/PropEdgeV12.0.git
+Working dir: ~/Documents/github/PropEdgeV12.0
 
 Commands:
   python3 run.py setup      — Configure Git + SSH + install launchd agents
-  python3 run.py generate   — Train all V10.0 models + build season JSONs (~4 min)
+  python3 run.py generate   — Train all V12.0 models + build season JSONs (~4 min)
   python3 run.py 0          — Run Batch 0  (grade + retrain, 06:00 UK)
   python3 run.py 1          — Run Batch 1  (predict, 08:00 UK)
   python3 run.py 2          — Run Batch 2  (predict, 18:00 UK)
@@ -39,11 +39,11 @@ def setup():
     """Configure Git remote, SSH key, and install all 4 launchd agents."""
     import os, textwrap
 
-    repo_dir = Path.home() / 'Documents' / 'GitHub' / 'PropEdgeV10.0'
+    repo_dir = Path.home() / 'Documents' / 'github' / 'PropEdgeV12.0'
     repo_dir.mkdir(parents=True, exist_ok=True)
 
     # Git remote
-    git_remote = 'git@github.com:iamwerewolf1007/PropEdgeV10.0.git'
+    git_remote = 'git@github.com:iamwerewolf1007/PropEdgeV12.0.git'
     subprocess.run(['git','init'], cwd=repo_dir, capture_output=True)
     result = subprocess.run(['git','remote','get-url','origin'], cwd=repo_dir, capture_output=True)
     if result.returncode != 0:
@@ -54,10 +54,10 @@ def setup():
 
     # launchd agents
     agents = [
-        ('com.propedge.v10.batch0',  '0 6 * * *',  [sys.executable, str(ROOT/'batch0_grade.py')]),
-        ('com.propedge.v10.batch1',  '0 8 * * *',  [sys.executable, str(ROOT/'batch_predict.py'),'1']),
-        ('com.propedge.v10.batch2',  '0 18 * * *', [sys.executable, str(ROOT/'batch_predict.py'),'2']),
-        ('com.propedge.v10.batch3',  '30 21 * * *',[sys.executable, str(ROOT/'batch_predict.py'),'3']),
+        ('com.propedge.v12.batch0',  '0 6 * * *',  [sys.executable, str(ROOT/'batch0_grade.py')]),
+        ('com.propedge.v12.batch1',  '0 8 * * *',  [sys.executable, str(ROOT/'batch_predict.py'),'1']),
+        ('com.propedge.v12.batch2',  '0 18 * * *', [sys.executable, str(ROOT/'batch_predict.py'),'2']),
+        ('com.propedge.v12.batch3',  '30 21 * * *',[sys.executable, str(ROOT/'batch_predict.py'),'3']),
     ]
     launch_agents_dir = Path.home() / 'Library' / 'LaunchAgents'
     launch_agents_dir.mkdir(parents=True, exist_ok=True)
@@ -106,10 +106,10 @@ def setup():
 
 
 def generate():
-    """Train all V10.0 models, then generate both season JSON files."""
+    """Train all V12.0 models, then generate both season JSON files."""
     print("="*60)
-    print("PropEdge V10.0 — Full Generate")
-    print("Step 1: Train all 4 V10.0 models")
+    print("PropEdge V12.0 — Full Generate")
+    print("Step 1: Train all 4 V12.0 models")
     print("="*60)
 
     result = subprocess.run([sys.executable, '-c', '''
@@ -118,7 +118,7 @@ from config import (FILE_GL_2425, FILE_GL_2526, FILE_H2H,
                     FILE_MODEL, FILE_TRUST, FILE_SEG_MODELS,
                     FILE_Q_MODELS, FILE_CALIBRATOR)
 from model_trainer import train_and_save
-print("Training V10.0 models (projection + segment + quantile + calibrator)...")
+print("Training V12.0 models (projection + segment + quantile + calibrator)...")
 train_and_save(
     FILE_GL_2425, FILE_GL_2526, FILE_H2H,
     FILE_MODEL, FILE_TRUST,

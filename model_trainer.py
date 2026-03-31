@@ -1,9 +1,9 @@
 """
-PropEdge V11.0 — Model Trainer
+PropEdge V12.0 — Model Trainer
 ================================
 Target: 80% direction accuracy at 40% conviction volume.
 
-Key changes from V10.0:
+Key changes from V12.0:
   [1] REAL BOOKMAKER LINES used where available (2025-26 Excel data)
       Merged from PropEdge_-_Match_and_Player_Prop_lines_.xlsx
       Gives 13,422 real-line training rows — the only rows where
@@ -45,13 +45,49 @@ import pandas as pd
 import numpy as np
 import pickle
 import json
+import subprocess
+import sys
 from pathlib import Path
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.isotonic import IsotonicRegression
 from sklearn.model_selection import TimeSeriesSplit, cross_val_predict
 from sklearn.metrics import accuracy_score, brier_score_loss, roc_auc_score
-from lightgbm import LGBMClassifier, LGBMRegressor
 from sklearn.linear_model import Ridge
+
+# LightGBM with full fallback
+# Handles three failure modes:
+#   ImportError  — package not installed (pip install lightgbm)
+#   OSError      — macOS missing libomp (brew install libomp)
+#   Any other    — silent fallback to GBR-based classifier
+_LGBM_AVAILABLE = False
+try:
+    from lightgbm import LGBMClassifier, LGBMRegressor
+    _LGBM_AVAILABLE = True
+except ImportError:
+    print("    lightgbm not installed — attempting pip install...")
+    try:
+        subprocess.check_call(
+            [sys.executable, '-m', 'pip', 'install', 'lightgbm', '--quiet'],
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        from lightgbm import LGBMClassifier, LGBMRegressor
+        _LGBM_AVAILABLE = True
+        print("    lightgbm installed ✓")
+    except Exception:
+        print("    lightgbm install failed — using GBR fallback")
+except OSError as e:
+    if 'libomp' in str(e):
+        print("    ⚠ lightgbm requires libomp on macOS.")
+        print("      Fix: brew install libomp   (then re-run generate)")
+        print("      Continuing with GBR fallback for now...")
+    else:
+        print(f"    ⚠ lightgbm load error ({e}) — using GBR fallback")
+
+if not _LGBM_AVAILABLE:
+    # GBR-based drop-in replacements — no external dependencies
+    from sklearn.ensemble import GradientBoostingClassifier as LGBMClassifier  # noqa: F811
+    from sklearn.ensemble import GradientBoostingRegressor  as LGBMRegressor   # noqa: F811
+    # Patch: GBC doesn't accept class_weight or num_leaves — handled below
+
 from config import get_dvp, POS_MAP, FILE_PROPS
 
 
@@ -130,7 +166,7 @@ def _pgrp(raw):
 
 def build_training_data(file_2425, file_2526, file_h2h):
     """
-    Build training samples with full V11.0 feature set.
+    Build training samples with full V12.0 feature set.
 
     Key addition: merges real bookmaker lines from FILE_PROPS (Excel)
     for 2025-26 rows. When a real line is available, it replaces the
@@ -410,7 +446,7 @@ def build_training_data(file_2425, file_2526, file_h2h):
 def train_and_save(file_2425, file_2526, file_h2h, model_file, trust_file,
                    segment_file=None, quantile_file=None, calibrator_file=None):
     """
-    V11.0 training pipeline.
+    V12.0 training pipeline.
     Trains:
       direction_classifier.pkl  — LightGBM binary classifier P(PTS > line)
       projection_model.pkl      — GBR Huber regression (point display)
@@ -437,25 +473,43 @@ def train_and_save(file_2425, file_2526, file_h2h, model_file, trust_file,
     tw = 1.0 + train_df['GAME_DATE'].rank() / n   # 1.0 → 2.0 linearly
 
     # ─ 1. DIRECT BINARY CLASSIFIER (primary direction model) ──────────────────
-    print("    Training LightGBM direction classifier...")
-    clf = LGBMClassifier(
-        n_estimators=400,
-        max_depth=6,
-        learning_rate=0.025,
-        num_leaves=40,
-        subsample=0.8,
-        colsample_bytree=0.8,
-        min_child_samples=15,
-        class_weight='balanced',   # handles 44.7% OVER base rate
-        random_state=42,
-        verbose=-1,
-    )
+    clf_label = "LightGBM" if _LGBM_AVAILABLE else "GBR (LightGBM fallback)"
+    print(f"    Training {clf_label} direction classifier...")
+
+    if _LGBM_AVAILABLE:
+        clf = LGBMClassifier(
+            n_estimators=400,
+            max_depth=6,
+            learning_rate=0.025,
+            num_leaves=40,
+            subsample=0.8,
+            colsample_bytree=0.8,
+            min_child_samples=15,
+            class_weight='balanced',
+            random_state=42,
+            verbose=-1,
+        )
+    else:
+        # GBR fallback — no libomp / lightgbm required
+        # class_weight not supported by GBC — we use sample_weight instead
+        from sklearn.ensemble import GradientBoostingClassifier
+        clf = GradientBoostingClassifier(
+            n_estimators=300,
+            max_depth=5,
+            learning_rate=0.03,
+            min_samples_leaf=15,
+            subsample=0.8,
+            random_state=42,
+        )
+        print("    ⚠ Using GBR classifier fallback — install libomp for LightGBM")
+        print("      macOS fix: brew install libomp")
 
     # OOF predictions for calibrator (5-fold temporal CV)
     print("    Computing OOF predictions for calibration (5-fold)...")
     tscv = TimeSeriesSplit(n_splits=5)
     oof_prob = np.zeros(n)
     for tr_idx, va_idx in tscv.split(X):
+        # Both LGBMClassifier and GradientBoostingClassifier accept sample_weight
         clf.fit(X.iloc[tr_idx], y.iloc[tr_idx],
                 sample_weight=tw.values[tr_idx])
         oof_prob[va_idx] = clf.predict_proba(X.iloc[va_idx])[:, 1]

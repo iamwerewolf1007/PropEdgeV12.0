@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-PropEdge V10.0 — Generate Season JSONs
+PropEdge V12.0 — Generate Season JSONs
 ========================================
 2024-25: Synthetic lines from game logs (all players with ≥10 games)
 2025-26: ALL rows from real prop lines Excel — zero filtering.
@@ -48,7 +48,7 @@ def _s(v):
 def run_model_on_props(props_df, all_logs, h2h_df, model, player_trust, season_label,
                        seg_model=None, q_models=None, calibrator=None):
     """
-    Run the full V10.0 prediction engine over a props DataFrame.
+    Run the full V12.0 prediction engine over a props DataFrame.
     ALL rows are processed — no tier/confidence filtering.
     DNP and ungraded plays handled cleanly.
     """
@@ -69,7 +69,7 @@ def run_model_on_props(props_df, all_logs, h2h_df, model, player_trust, season_l
     pace_rank = {t: i + 1 for i, (t, _) in
                  enumerate(team_fga.sort_values(ascending=False).items())}
 
-    # V10.0 caches (built once, used per-row)
+    # V12.0 caches (built once, used per-row)
     b2b_delta_cache = build_b2b_delta(played_only)
     dyn_dvp_cache   = build_dynamic_dvp(played_only)
 
@@ -173,7 +173,7 @@ def run_model_on_props(props_df, all_logs, h2h_df, model, player_trust, season_l
         min_cv = feats['min_cv']; ppm = feats['ppm']
         rmt = feats['rmt']; fpm = feats['fpm']
 
-        # V10.0 features
+        # V12.0 features
         l10_ewm         = feats.get('l10_ewm', L10)
         l5_ewm          = feats.get('l5_ewm', L5)
         usage_l10       = feats.get('usage_l10', 0.0)
@@ -383,7 +383,7 @@ def run_model_on_props(props_df, all_logs, h2h_df, model, player_trust, season_l
             'predQ75': round(pred_q75, 1) if pred_q75 is not None else None,
             'tierLabel': tl, 'position': position, 'match': game,
             'isHome': is_home, 'recent': r20[:5], 'hr30': hr30, 'hr10': hr10,
-            # V10.0
+            # V12.0
             'usage_l10': usage_l10, 'fg3a_l10': fg3a_l10,
             'home_l10': home_l10, 'away_l10': away_l10,
             'home_away_split': home_away_split,
@@ -455,7 +455,7 @@ def run_model_on_props(props_df, all_logs, h2h_df, model, player_trust, season_l
             'predGap':  _s(round(pred_gap,  1)) if pred_pts  is not None else None,
             'predQ25':  _s(round(pred_q25,  1)) if pred_q25  is not None else None,
             'predQ75':  _s(round(pred_q75,  1)) if pred_q75  is not None else None,
-            # V10.0 extra fields
+            # V12.0 extra fields
             'l10Ewm':        _s(round(l10_ewm, 1)),
             'usageL10':      _s(round(usage_l10, 1)),
             'usageSegment':  int(usage_segment),
@@ -521,7 +521,7 @@ def _make_minimal_play(player, date_str, line, game, home_team, away_team,
 
 def main():
     print("=" * 60)
-    print("PropEdge V10.0 — Generate Season JSONs")
+    print("PropEdge V12.0 — Generate Season JSONs")
     print("=" * 60)
     t0 = time.time()
 
@@ -538,7 +538,7 @@ def main():
         with open(FILE_MODEL, 'rb') as f: model = pickle.load(f)
         print("  ✓ Loaded projection_model.pkl")
     else:
-        print("  Training V10.0 models first...")
+        print("  Training V12.0 models first...")
         from model_trainer import train_and_save
         model = train_and_save(
             FILE_GL_2425, FILE_GL_2526, FILE_H2H,

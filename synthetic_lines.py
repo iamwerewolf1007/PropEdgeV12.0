@@ -1,5 +1,5 @@
 """
-PropEdge V9.2 — Synthetic Line Generator
+PropEdge V12.0 — Synthetic Line Generator
 ==========================================
 Generates realistic prop lines for 2024-25 season backtest.
 Mimics sportsbook line-setting: weighted averages + matchup adjustments.

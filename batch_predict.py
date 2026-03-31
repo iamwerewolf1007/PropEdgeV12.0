@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-PropEdge V11.0 — BATCH PREDICT
+PropEdge V12.0 — BATCH PREDICT
 ================================
 Usage: python3 batch_predict.py [1|2|3] [YYYY-MM-DD]
 
@@ -199,7 +199,7 @@ def fetch_props(date_str):
     return games,spreads
 
 def run_predictions(games,date_str):
-    print(f"\n  Running V11.0 predictions...")
+    print(f"\n  Running V12.0 predictions...")
     combined=load_combined(FILE_GL_2425,FILE_GL_2526)
     h2h=pd.read_csv(FILE_H2H)
     h2h_dedup=h2h.drop_duplicates(subset=['PLAYER_NAME','OPPONENT'],keep='last')
@@ -518,7 +518,7 @@ def save_today(plays,date_str):
 def main():
     date_str=today_et()
     if len(sys.argv)>2 and '-' in sys.argv[2]: date_str=sys.argv[2]
-    print("="*60); print(f"PropEdge V11.0 — BATCH {BATCH}: PREDICT")
+    print("="*60); print(f"PropEdge V12.0 — BATCH {BATCH}: PREDICT")
     print(f"  Date: {date_str} | {now_uk().strftime('%Y-%m-%d %H:%M %Z')}"); print("="*60)
     log_event(f'B{BATCH}','BATCH_START',detail=date_str)
     games,_=fetch_props(date_str)
@@ -531,7 +531,7 @@ def main():
     log_event(f'B{BATCH}','BATCH_COMPLETE')
     try:
         import subprocess
-        subprocess.run(['osascript','-e',f'display notification "B{BATCH}: {len(plays)} plays" with title "PropEdge V11.0"'],capture_output=True,timeout=5)
+        subprocess.run(['osascript','-e',f'display notification "B{BATCH}: {len(plays)} plays" with title "PropEdge V12.0"'],capture_output=True,timeout=5)
     except: pass
 
 if __name__=='__main__': main()

@@ -1,7 +1,7 @@
 """
-PropEdge V10.0 — Rolling Stats Engine
+PropEdge V12.0 — Rolling Stats Engine
 =======================================
-Completely independent from V9.2.
+Completely independent from V12.0.
 
 Core guarantees:
   - Never reads pre-computed L*_* CSV columns (they go stale)
@@ -10,7 +10,7 @@ Core guarantees:
   - Prediction-time cutoff: strictly < game_date (no lookahead)
   - Post-game display cutoff: ≤ game_date (includes result)
 
-V10.0 new features in extract_prediction_features():
+V12.0 new features in extract_prediction_features():
   l10_ewm, l5_ewm        — Exponential decay rolling (recency-weighted)
   usage_l10, usage_l30   — Usage rate rolling (corr=0.885 with PTS)
   fg3a_l10, fg3m_l10     — 3-point volume rolling
@@ -126,7 +126,7 @@ def extract_prediction_features(prior_played, line,
                                  opp=None, pos=None,
                                  player_name=None, game_date=None):
     """
-    Compute all V10.0 prediction features from prior played games only.
+    Compute all V12.0 prediction features from prior played games only.
     No lookahead — prior_played must already be filtered to < game_date.
     Returns None if fewer than 5 played games.
     """

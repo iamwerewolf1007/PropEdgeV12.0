@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-PropEdge V10.0 — BATCH 0: GRADE + UPDATE (6:00 AM UK)
+PropEdge V12.0 — BATCH 0: GRADE + UPDATE (6:00 AM UK)
 =========================================================
 Runs after games finish. Does in order:
 1. Fetch box scores from nba_api (ScoreboardV3 + BoxScoreTraditionalV3)
@@ -614,7 +614,7 @@ def update_daily_excel(date_str, plays_for_date):
 # ─── MAIN ────────────────────────────────────────────────────
 def main():
     print("="*60)
-    print(f"PropEdge V10.0 — BATCH 0: GRADE + UPDATE")
+    print(f"PropEdge V12.0 — BATCH 0: GRADE + UPDATE")
     print(f"  {now_uk().strftime('%Y-%m-%d %H:%M %Z')}")
     print("="*60)
     log_event('B0','BATCH_START')
@@ -650,8 +650,8 @@ def main():
     from h2h_builder import build_h2h
     build_h2h(FILE_GL_2425, FILE_GL_2526, FILE_H2H)
 
-    # 8. Retrain model (V10.0 — trains all 4 model files)
-    print("  Retraining V10.0 models...")
+    # 8. Retrain model (V12.0 — trains all 4 model files)
+    print("  Retraining V12.0 models...")
     from model_trainer import train_and_save
     train_and_save(FILE_GL_2425, FILE_GL_2526, FILE_H2H, FILE_MODEL, FILE_TRUST,
                    segment_file=FILE_SEG_MODELS,
@@ -662,7 +662,7 @@ def main():
     repo = REPO_DIR if REPO_DIR.exists() else ROOT
     git_push(repo, f"B0: grade {yesterday}")
     log_event('B0','BATCH_COMPLETE')
-    notify("PropEdge V10.0", f"B0 done — graded {yesterday}")
+    notify("PropEdge V12.0", f"B0 done — graded {yesterday}")
     print("  ✓ BATCH 0 complete")
 
 

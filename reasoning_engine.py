@@ -1,9 +1,9 @@
 """
-PropEdge V10.0 — Reasoning Engine
+PropEdge V12.0 — Reasoning Engine
 ====================================
 Generates pre-match and post-match narrative for each prediction.
 
-V10.0 additions:
+V12.0 additions:
   - generate_pre_match_reason: surfaces usage rate, home/away split,
     3-pt volume, quantile bands, B2B quality delta, high-line risk
   - generate_post_match_reason: now accepts optional box_data dict,
@@ -75,7 +75,7 @@ def generate_pre_match_reason(play):
     h2hTsDev     = float(play.get('h2hTsDev', 0) or 0)
     tl           = play.get('tierLabel', 'T3')
 
-    # V10.0
+    # V12.0
     usage_l10       = float(play.get('usage_l10', 0) or 0)
     fg3a_l10        = float(play.get('fg3a_l10', 0) or 0)
     home_l10        = play.get('home_l10')

@@ -1,5 +1,5 @@
 """
-PropEdge V10.0 — Player Segment Models
+PropEdge V12.0 — Player Segment Models
 ========================================
 Trains and serves three separate GBR models based on usage tier:
   0 = Role players      (usage_l10 < 15%)   — 76.7% of all plays

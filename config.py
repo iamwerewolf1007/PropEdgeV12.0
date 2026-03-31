@@ -1,9 +1,9 @@
 """
 PropEdge V12.0 — Configuration & Shared Constants
 ===================================================
-Completely independent from V9.2.
-Repo:       git@github.com:iamwerewolf1007/PropEdgeV10.0.git
-Working dir: ~/Documents/GitHub/PropEdgeV10.0
+PropEdge V12.0 — complete independent build.
+Repo:       git@github.com:iamwerewolf1007/PropEdgeV12.0.git
+Working dir: ~/Documents/github/PropEdgeV12.0
 
 Timezone design:
   All game dates are stored and compared in US Eastern Time (ET).
@@ -55,7 +55,7 @@ SEASON_2526 = DATA_DIR / 'season_2025_26.json'
 AUDIT_LOG   = DATA_DIR / 'audit_log.csv'
 
 # ─── REPO / GIT ───────────────────────────────────────────────────────────────
-REPO_DIR   = Path.home() / 'Documents' / 'GitHub' / 'PropEdgeV12.0'
+REPO_DIR   = Path.home() / 'Documents' / 'github' / 'PropEdgeV12.0'
 GIT_REMOTE = 'git@github.com:iamwerewolf1007/PropEdgeV12.0.git'
 
 # ─── API ──────────────────────────────────────────────────────────────────────

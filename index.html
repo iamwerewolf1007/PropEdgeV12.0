@@ -446,7 +446,7 @@ function render() {
   }
 
   // ─── FOOTER ───
-  h += `<div class="ft"><strong style="color:var(--tx2)">PropEdge V12.0</strong> &middot; Dual-engine (10-signal + GBR) &middot; T1 ≥62% (2-3u) &middot; T2 ≥55% (1u) &middot; DNP plays voided &middot; ${curSeason}</div>`;
+  h += `<div class="ft"><strong style="color:var(--tx2)">PropEdge V12.0</strong> &middot; Dual-engine (Classifier + GBR) &middot; T1 ≥62% (2-3u) &middot; T2 ≥55% (1u) &middot; DNP plays voided &middot; ${curSeason}</div>`;
 
   document.getElementById('app').innerHTML = h;
 }
@@ -499,7 +499,7 @@ function renderDaily(DS, dates, curDate) {
   const gm = [...new Set(valid.map(p => p.match))];
   const isPreGame = graded.length === 0 && valid.length > 0;
 
-  // Summary boxes (V9.1 original)
+  // Summary boxes (V12.0)
   const sbActive = 'box-shadow:0 0 0 1.5px var(--bl);';
   h += `<div class="sum4">
     <div class="sb" style="cursor:pointer;${fTier === 'all' && fDir === 'all' && fRes === 'all' ? sbActive : ''}" onclick="fTier='all';fDir='all';fRes='all';fMatch='all';render()">
@@ -894,7 +894,7 @@ function card(p) {
     if (p.bucketHR) h += `<span style="color:var(--vi)">Sim: ${p.bucketHR}% (${p.bucketPlays}p)</span>`;
     h += `</div>`;
 
-    // Post-match reason — V9.2 uses postMatchReason; fall back to legacy reason field
+    // Post-match reason — V12.0 uses postMatchReason; fall back to legacy reason field
     const postReason = p.postMatchReason || p.reason;
     if (postReason && p.result) {
       const resC = p.result === 'WIN' ? 'var(--gr)' : 'var(--rd)';
