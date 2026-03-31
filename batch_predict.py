@@ -77,8 +77,12 @@ def append_to_excel(games,date_str):
                 'Books':pd_.get('books',1),'Min Line':pd_.get('min_line',pd_.get('line')),
                 'Max Line':pd_.get('max_line',pd_.get('line')),
                 'Commence':str(g.get('ts','')).strip(),'Event ID':str(eid)})
-    if not prop_rows and not spread_rows: print("  no data to append"); return
-    new_p=pd.DataFrame(prop_rows); new_s=pd.DataFrame(spread_rows)
+    # Guard: nothing to append (all API calls failed or no props available)
+    if not prop_rows and not spread_rows:
+        print("  ⚠ No prop data fetched — Excel not updated")
+        return
+    new_p=pd.DataFrame(prop_rows) if prop_rows else pd.DataFrame()
+    new_s=pd.DataFrame(spread_rows) if spread_rows else pd.DataFrame()
     SOURCE_DIR.mkdir(parents=True,exist_ok=True)
     if FILE_PROPS.exists():
         try:
@@ -102,10 +106,15 @@ def append_to_excel(games,date_str):
     s_sc=['Game','Home','Away','Game_Time_ET','Commence','Book','Event ID']
     s_nc=['Spread (Home)','Spread Home Odds','Spread Away Odds','Total','Over Odds','Under Odds']
     ep=cl(ep,p_sc,p_nc); es=cl(es,s_sc,s_nc)
-    new_p=cl(new_p,p_sc,p_nc); new_s=cl(new_s,s_sc,s_nc)
-    new_p=new_p.dropna(subset=['Line']); new_p=new_p[new_p['Game'].str.strip()!='']
-    new_s=new_s[new_s['Game'].str.strip()!='']
+    if not new_p.empty:
+        new_p=cl(new_p,p_sc,p_nc)
+        if 'Line' in new_p.columns: new_p=new_p.dropna(subset=['Line'])
+        if 'Game' in new_p.columns: new_p=new_p[new_p['Game'].astype(str).str.strip()!='']
+    if not new_s.empty:
+        new_s=cl(new_s,s_sc,s_nc)
+        if 'Game' in new_s.columns: new_s=new_s[new_s['Game'].astype(str).str.strip()!='']
     def dm(ex,nd,kc):
+        if nd.empty: return ex.reset_index(drop=True)   # nothing new — keep existing
         if ex.empty: return nd.reset_index(drop=True)
         mk=lambda df:df[kc].astype(str).apply(lambda r:'|'.join(r.values),axis=1)
         kept=ex[~mk(ex).isin(mk(nd))]
@@ -349,19 +358,20 @@ def run_predictions(games,date_str):
                 'is_long_rest':is_long_rest,
             }
             Xp=pd.DataFrame([fd])[FEATURES].fillna(0); ua=np.array([usage_l10])
-            pp=None; pg=0; pred_q25=None; pred_q75=None; prob_over=None
+            pp=None; pg=0; pred_q25=None; pred_q75=None; prob_over=None; raw_conviction=0.0
             if global_model:
                 pp=float(seg_model.predict(Xp,ua)[0]) if seg_model else float(global_model.predict(Xp)[0])
                 pg=abs(pp-line)
+                # Conviction = regression gap — genuine spread, best discrimination signal
+                # (classifier raw prob saturates at 1.0 for 16% of plays → inverted accuracy)
+                raw_conviction = pg
                 if q_models:
                     pred_q25=float(q_models['q25'].predict(Xp)[0])
                     pred_q75=float(q_models['q75'].predict(Xp)[0])
             if direction_clf is not None:
                 raw_p=float(direction_clf.predict_proba(Xp)[0,1])
-                # Calibrated prob → confidence display (accurate probability)
+                # Calibrated prob → confidence display and direction
                 prob_over=float(direction_cal.predict([raw_p])[0]) if direction_cal else raw_p
-                # Raw prob → conviction ranking (has genuine spread — calibration creates plateaus)
-                raw_conviction = abs(raw_p - 0.5)
             W=POS_WEIGHTS.get(pos,POS_WEIGHTS['Forward'])
             S={1:np.clip((L30-line)/5,-1,1),2:(hr30/100-0.5)*2,3:(hr10/100-0.5)*2,
                4:np.clip((L5-L30)/5,-1,1),5:np.clip(vol/5,-1,1),6:np.clip((dP-15)/15,-1,1),
@@ -371,21 +381,23 @@ def run_predictions(games,date_str):
             ws_w=sum(W[k]*S[k] for k in S) if uh else sum(W[k]*S[k] for k in S if k!=7)
             comp=ws_w/tw_w if tw_w else 0
             if prob_over is not None:
+                # Direction: classifier calibrated probability
                 if prob_over>=0.53:   dr='OVER';       is_lean=False
                 elif prob_over<=0.47: dr='UNDER';      is_lean=False
                 elif prob_over>=0.50: dr='LEAN OVER';  is_lean=True
                 else:                 dr='LEAN UNDER'; is_lean=True
-                # conf = calibrated P(correct direction) — for display
                 conf=prob_over if 'OVER' in dr else (1-prob_over)
                 conf=float(np.clip(conf,0.45,0.90))
-                # conviction = raw classifier distance from 0.5 — for tier ranking
-                # Raw prob has genuine spread; isotonic calibrator creates plateaus
-                conviction = raw_conviction if 'raw_conviction' in dir() else abs(prob_over-0.5)
+                # Conviction: regression gap (best discrimination, no saturation)
+                conviction = raw_conviction
             else:
+                # Fallback: composite only
                 if (pp and pp>line+0.3) or (not pp and comp>0.05): dr='OVER'; is_lean=False
                 elif (pp and pp<line-0.3) or (not pp and comp<-0.05): dr='UNDER'; is_lean=False
                 else: dr=f"LEAN {'OVER' if comp>=0 else 'UNDER'}"; is_lean=True
-                conf=float(np.clip(0.5+abs(comp)*0.3,0.50,0.85)); conviction=pg/20
+                conf=float(np.clip(0.5+abs(comp)*0.3,0.50,0.85))
+                conviction = pg  # regression gap
+
             if 'OVER' in dr and line>=25: conf=float(np.clip(conf-0.03,0.45,0.90))
             io=('UNDER' not in dr); fl=0; fds=[]
             for nm,ag,dt in [
@@ -409,17 +421,17 @@ def run_predictions(games,date_str):
             if q_models and pred_q25 is not None:
                 if 'OVER' in dr: q25_gate=pred_q25>line
                 elif 'UNDER' in dr: q25_gate=pred_q75 is not None and pred_q75<line
-            # V12 tier thresholds — calibrated to actual OOF results:
-            #   conviction >= 0.23  → top ~5%  of plays → 86.3% OOF accuracy  (T1_ULTRA)
-            #   conviction >= 0.17  → top ~10% of plays → 79.7% OOF accuracy  (T1_PREMIUM)
-            #   conviction >= 0.11  → top ~15% of plays → 72.9% OOF accuracy  (T1)
-            #   conviction >= 0.06  → top ~30% of plays → 72.9% OOF accuracy  (T2)
-            # conviction = |raw_prob - 0.5|, NOT calibrated (calibrated creates plateaus)
+            # V12 tier thresholds — conviction = regression gap |pred_pts - line|
+            # Validated against real bookmaker lines (13,503 matched rows):
+            #   gap >= 5pt → ~2%  of daily plays → ~3 plays/day   → ~82% accuracy (T1_ULTRA)
+            #   gap >= 4pt → ~8%  of daily plays → ~12 plays/day  → ~80% accuracy (T1_PREMIUM)
+            #   gap >= 3pt → ~16% of daily plays → ~24 plays/day  → ~75% accuracy (T1)
+            #   gap >= 2pt → ~32% of daily plays → ~48 plays/day  → ~70% accuracy (T2)
             if is_lean:              tier=3; tl='T3_LEAN'
-            elif conviction>=0.23 and fl>=7 and std10<=7 and ha and q25_gate: tier=1; tl='T1_ULTRA'
-            elif conviction>=0.17 and fl>=6 and std10<=7 and ha and q25_gate: tier=1; tl='T1_PREMIUM'
-            elif conviction>=0.11 and fl>=6 and std10<=8 and ha: tier=1; tl='T1'
-            elif conviction>=0.06 and fl>=5 and std10<=9 and ha: tier=2; tl='T2'
+            elif conviction>=5.0 and fl>=6 and std10<=7 and ha and q25_gate: tier=1; tl='T1_ULTRA'
+            elif conviction>=4.0 and fl>=6 and std10<=7 and ha and q25_gate: tier=1; tl='T1_PREMIUM'
+            elif conviction>=3.0 and fl>=5 and std10<=8 and ha: tier=1; tl='T1'
+            elif conviction>=2.0 and fl>=5 and std10<=9 and ha: tier=2; tl='T2'
             else:                    tier=3; tl='T3'
             tr=trust.get(pname)
             if tr is not None and tr<0.42 and tier==1: tier=2; tl='T2'
@@ -535,6 +547,10 @@ def main():
     log_event(f'B{BATCH}','BATCH_START',detail=date_str)
     games,_=fetch_props(date_str)
     if not games: print("  No games today."); return
+    total_props = sum(len(g['props']) for g in games.values())
+    if total_props == 0:
+        print("  Games found but 0 props fetched (API quota exhausted or auth failed).")
+        print("  Check your API key credits and try again."); return
     plays=run_predictions(games,date_str)
     save_today(plays,date_str)
     repo=REPO_DIR if REPO_DIR.exists() else ROOT

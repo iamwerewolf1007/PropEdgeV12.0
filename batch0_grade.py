@@ -28,7 +28,8 @@ sys.path.insert(0, str(Path(__file__).parent.resolve()))
 from config import *
 from audit import log_event, log_file_state, verify_no_deletion, log_batch_summary
 from rolling_engine import filter_played, compute_rolling_for_new_rows, \
-                           build_player_index, get_prior_games_played, extract_prediction_features
+                           load_combined, build_player_index, \
+                           get_prior_games_played, extract_prediction_features
 from reasoning_engine import generate_post_match_reason
 
 
@@ -309,7 +310,6 @@ def crosscheck_rolling_stats(plays_for_date, date_str):
     integrity = {}
 
     try:
-        from rolling_engine import load_combined, build_player_index
         combined = load_combined(FILE_GL_2425, FILE_GL_2526)
         pidx     = build_player_index(combined)
 

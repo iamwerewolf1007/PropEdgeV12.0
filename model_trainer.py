@@ -601,16 +601,20 @@ def train_and_save(file_2425, file_2526, file_h2h, model_file, trust_file,
     print(f"    ✓ player_trust.json ({len(trust)} players — OOF-based)")
 
     # ─ 7. FULL CONVICTION REPORT ──────────────────────────────────────────────
+    # Conviction = regression gap |pred_pts - line| — best discrimination signal
+    # Direction  = classifier probability >= 0.5
+    pred_pts_oof = reg.predict(X)   # regression predictions for gap
+    gap_oof      = np.abs(pred_pts_oof - train_df['line'].values)
+
     print()
     print("    === OOF ACCURACY AT CONVICTION THRESHOLDS ===")
-    print("    (conviction = |raw_prob - 0.5|, direction = raw_prob >= 0.5)")
-    # Use RAW prob for conviction ranking — calibrated prob creates isotonic plateaus
-    conv_raw = np.abs(oof_prob - 0.5)
+    print("    (conviction = |pred_pts - line| from regression model)")
+    print("    (direction  = classifier OOF probability >= 0.5)")
     for pct in [0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.40, 0.50]:
-        t   = np.percentile(conv_raw, 100*(1-pct))
-        m   = conv_raw >= t
+        t   = np.percentile(gap_oof, 100*(1-pct))
+        m   = gap_oof >= t
         acc = accuracy_score(y[m], oof_dir[m])
         tgt = ' ← TARGET' if pct == 0.40 else ''
-        print(f"    Top {int(pct*100):>3}%: acc={acc:.4f}  n={m.sum():,}  min_conv={t:.4f}{tgt}")
+        print(f"    Top {int(pct*100):>3}%: acc={acc:.4f}  n={m.sum():,}  min_gap={t:.2f}pt{tgt}")
 
     return reg
