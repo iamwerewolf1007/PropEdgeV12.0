@@ -1,0 +1,37 @@
+============================================================
+PropEdge V12.0 — BATCH 3: PREDICT
+  Date: 2026-04-01 | 2026-04-01 21:30 UTC+01:00
+============================================================
+
+  Fetching props: 2026-04-01 (B3)
+    Credits: 19354 events
+    9 games
+    Credits: 19351 
+    ✓ ATL @ ORL: 13 props
+    Credits: 19348 
+    ✓ PHI @ WAS: 12 props
+    Credits: 19345 
+    ✓ BOS @ MIA: 13 props
+    Credits: 19342 
+    ✓ MIL @ HOU: 10 props
+    Credits: 19339 
+    ✓ NYK @ MEM: 11 props
+    Credits: 19336 
+    ✓ SAC @ TOR: 14 props
+    Credits: 19333 
+    ✓ IND @ CHI: 10 props
+    Credits: 19330 
+    ✓ DEN @ UTA: 12 props
+    Credits: 19327 
+    ✓ SAS @ GSW: 13 props
+  Total: 108 props, 9 games
+  ✓ Excel: Player_Points_Props 16,322→16,323 (+1) | Spreads 1,394→1,394 (+0)
+
+  Running V12.0 predictions...
+    Building caches...
+    ✓ V11 direction classifier
+  107 predictions (103 conviction + 4 leans, 1 skipped)
+    Skips: 1 no_player
+
+  ✓ today.json: 115 plays (20 T1, 9 T2) | Added:1 Updated:106 Preserved:8
+  ✓ Git push: B3: 2026-04-01 — 107 plays
