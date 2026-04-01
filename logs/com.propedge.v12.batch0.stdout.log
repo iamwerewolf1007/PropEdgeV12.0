@@ -1,0 +1,58 @@
+============================================================
+PropEdge V12.0 — BATCH 0: GRADE + UPDATE
+  2026-04-01 06:00 UTC+01:00
+============================================================
+  Grading: 2026-03-31
+
+  Fetching box scores: 2026-03-31...
+    7 games
+  Fetched 118 played rows, 183 players in box
+  ✓ Graded 58: 28W/30L, 26 DNP
+  ✓ Game logs: 24300 → 24444 (+118 played, +26 DNP stubs)
+  ✓ Rolling update 2026-03-31: 58 refreshed, 26 DNP skipped, 0 insufficient history, 0 errors
+
+  Cross-checking rolling stats for 2026-03-31...
+  ✓ Cross-check: all rolling stats consistent for 2026-03-31
+
+  Rebuilding H2H...
+  ✓ H2H: 15549 pairs → h2h_database.csv
+  Retraining V12.0 models...
+    Building training data...
+    Played rows: 50,093   Players: 631
+    Computing vectorised rolling features...
+    After sequence filter: 44,050
+    Real bookmaker lines merged: 13,646/44,050 rows (31.0%)
+    Final training samples: 44,050
+    Training LightGBM direction classifier...
+    Computing OOF predictions for calibration (5-fold)...
+    ✓ direction_classifier.pkl
+    OOF direction accuracy: 0.6586
+    OOF Brier score:        0.2421  (0.25 = random)
+    OOF ROC-AUC:            0.6747
+    OOF accuracy at top 40%: 0.7271  (target: 0.800)
+    ✓ calibrator.pkl  (OOF-fitted — Brier=0.2421)
+    Training GBR Huber regressor (point projection)...
+    GBR trees: 300
+    ✓ projection_model.pkl
+    Building segment model wrapper...
+    Segment 'role': 33,800 rows  trees=200
+    Segment 'rotational': 7,083 rows  trees=200
+    Segment 'star': 3,167 rows  trees=200
+    ✓ segment_model.pkl
+    Training quantile GBR (P25 + P75)...
+    ✓ quantile_models.pkl
+    ✓ player_trust.json (548 players — OOF-based)
+
+    === OOF ACCURACY AT CONVICTION THRESHOLDS ===
+    (conviction = |pred_pts - line| from regression model)
+    (direction  = classifier OOF probability >= 0.5)
+    Top   5%: acc=0.8643  n=2,203  min_gap=6.27pt
+    Top  10%: acc=0.8434  n=4,405  min_gap=4.98pt
+    Top  15%: acc=0.8310  n=6,608  min_gap=4.24pt
+    Top  20%: acc=0.8221  n=8,810  min_gap=3.72pt
+    Top  25%: acc=0.8159  n=11,013  min_gap=3.32pt
+    Top  30%: acc=0.8045  n=13,215  min_gap=2.98pt
+    Top  40%: acc=0.7823  n=17,620  min_gap=2.41pt ← TARGET
+    Top  50%: acc=0.7602  n=22,025  min_gap=1.92pt
+  ✓ Git push: B0: grade 2026-03-31
+  ✓ BATCH 0 complete
