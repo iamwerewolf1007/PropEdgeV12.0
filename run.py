@@ -8,7 +8,7 @@ Working dir: ~/Documents/github/PropEdgeV12.0
 Commands:
   python3 run.py setup      — Configure Git + SSH + install launchd agents
   python3 run.py generate   — Train all V12.0 models + build season JSONs (~4 min)
-  python3 run.py 0          — Run Batch 0  (grade + retrain, 06:00 UK)
+  python3 run.py 0          — Run Batch 0  (grade + retrain, 07:30 UK)
   python3 run.py 1          — Run Batch 1  (predict, 08:00 UK)
   python3 run.py 2          — Run Batch 2  (predict, 18:00 UK)
   python3 run.py 3          — Run Batch 3  (pre-tip, 21:30 UK)
@@ -54,7 +54,7 @@ def setup():
 
     # launchd agents
     agents = [
-        ('com.propedge.v12.batch0',  '0 6 * * *',  [sys.executable, str(ROOT/'batch0_grade.py')]),
+        ('com.propedge.v12.batch0',  '30 7 * * *',  [sys.executable, str(ROOT/'batch0_grade.py')]),
         ('com.propedge.v12.batch1',  '0 8 * * *',  [sys.executable, str(ROOT/'batch_predict.py'),'1']),
         ('com.propedge.v12.batch2',  '0 18 * * *', [sys.executable, str(ROOT/'batch_predict.py'),'2']),
         ('com.propedge.v12.batch3',  '30 21 * * *',[sys.executable, str(ROOT/'batch_predict.py'),'3']),
