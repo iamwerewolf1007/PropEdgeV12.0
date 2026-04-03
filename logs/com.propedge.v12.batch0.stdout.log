@@ -114,3 +114,61 @@ PropEdge V12.0 — BATCH 0: GRADE + UPDATE
     Top  50%: acc=0.7593  n=22,131  min_gap=1.93pt
   ✓ Git push: B0: grade 2026-04-01
   ✓ BATCH 0 complete
+============================================================
+PropEdge V12.0 — BATCH 0: GRADE + UPDATE
+  2026-04-03 06:00 UTC+01:00
+============================================================
+  Grading: 2026-04-02
+
+  Fetching box scores: 2026-04-02...
+    6 games
+  Fetched 90 played rows, 166 players in box
+  ✓ Graded 54: 28W/26L, 31 DNP
+  ✓ Game logs: 24671 → 24792 (+90 played, +31 DNP stubs)
+  ✓ Rolling update 2026-04-02: 54 refreshed, 31 DNP skipped, 0 insufficient history, 0 errors
+
+  Cross-checking rolling stats for 2026-04-02...
+  ✓ Cross-check: all rolling stats consistent for 2026-04-02
+
+  Rebuilding H2H...
+  ✓ H2H: 15583 pairs → h2h_database.csv
+  Retraining V12.0 models...
+    Building training data...
+    Played rows: 50,421   Players: 632
+    Computing vectorised rolling features...
+    After sequence filter: 44,367
+    Real bookmaker lines merged: 13,810/44,367 rows (31.1%)
+    Final training samples: 44,367
+    Training LightGBM direction classifier...
+    Computing OOF predictions for calibration (5-fold)...
+    ✓ direction_classifier.pkl
+    OOF direction accuracy: 0.6569
+    OOF Brier score:        0.2422  (0.25 = random)
+    OOF ROC-AUC:            0.6747
+    OOF accuracy at top 40%: 0.7268  (target: 0.800)
+    ✓ calibrator.pkl  (OOF-fitted — Brier=0.2422)
+    Training GBR Huber regressor (point projection)...
+    GBR trees: 300
+    ✓ projection_model.pkl
+    Building segment model wrapper...
+    Segment 'role': 34,087 rows  trees=200
+    Segment 'rotational': 7,109 rows  trees=200
+    Segment 'star': 3,171 rows  trees=200
+    ✓ segment_model.pkl
+    Training quantile GBR (P25 + P75)...
+    ✓ quantile_models.pkl
+    ✓ player_trust.json (548 players — OOF-based)
+
+    === OOF ACCURACY AT CONVICTION THRESHOLDS ===
+    (conviction = |pred_pts - line| from regression model)
+    (direction  = classifier OOF probability >= 0.5)
+    Top   5%: acc=0.8585  n=2,219  min_gap=6.27pt
+    Top  10%: acc=0.8429  n=4,437  min_gap=5.01pt
+    Top  15%: acc=0.8314  n=6,655  min_gap=4.28pt
+    Top  20%: acc=0.8195  n=8,874  min_gap=3.74pt
+    Top  25%: acc=0.8095  n=11,092  min_gap=3.35pt
+    Top  30%: acc=0.8019  n=13,310  min_gap=3.01pt
+    Top  40%: acc=0.7806  n=17,747  min_gap=2.43pt ← TARGET
+    Top  50%: acc=0.7592  n=22,184  min_gap=1.93pt
+  ✓ Git push: B0: grade 2026-04-02
+  ✓ BATCH 0 complete
