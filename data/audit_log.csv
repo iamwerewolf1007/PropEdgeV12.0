@@ -161,3 +161,10 @@ ts,batch,event,file,rows_before,rows_after,detail
 2026-04-04 08:34:29,B1,BATCH_SUMMARY,,,,"props_fetched=37, plays_added=37"
 2026-04-04 08:34:29,B1,INTEGRITY_OK,/Users/salman/Documents/GitHub/PropEdgeV12.0/data/today.json,393,430,SAVE_TODAY
 2026-04-04 08:34:54,B1,BATCH_COMPLETE,,,,
+2026-04-04 08:43:19,B0,BATCH_COMPLETE,,,,
+2026-04-04 13:22:17,B0,BATCH_START,,,,
+2026-04-04 13:22:29,B0,BOXSCORES_FETCHED,,,,202 rows for 2026-04-03
+2026-04-04 13:22:30,B0,BATCH_SUMMARY,,,,"plays_graded=0, wins=0, losses=0, dnp=6"
+2026-04-04 13:22:33,B0,FILE_STATE_BEFORE_APPEND,nba_gamelogs_2025_26.csv,25016,,
+2026-04-04 13:22:59,B0,INTEGRITY_OK,/Users/salman/Documents/GitHub/PropEdgeV12.0/source-files/nba_gamelogs_2025_26.csv,25016,25016,APPEND_GAMELOGS
+2026-04-04 13:23:11,B0,ROLLING_UPDATE_COMPLETE,,,,date=2026-04-03 refreshed=101 dnp=6 insuf=0
