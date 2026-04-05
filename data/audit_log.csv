@@ -196,3 +196,4 @@ ts,batch,event,file,rows_before,rows_after,detail
 2026-04-05 09:37:54,B1,PREDICTIONS,,,,131 plays
 2026-04-05 09:37:55,B1,BATCH_SUMMARY,,,,"props_fetched=131, plays_added=131"
 2026-04-05 09:37:55,B1,INTEGRITY_OK,/Users/salman/Documents/GitHub/PropEdgeV12.0/data/today.json,435,566,SAVE_TODAY
+2026-04-05 09:38:06,B1,BATCH_COMPLETE,,,,
