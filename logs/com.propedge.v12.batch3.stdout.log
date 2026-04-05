@@ -101,3 +101,28 @@ PropEdge V12.0 — BATCH 3: PREDICT
 
   ✓ today.json: 107 plays (11 T1, 15 T2) | Added:4 Updated:101 Preserved:2
   ✓ Git push: B3: 2026-04-03 — 105 plays
+============================================================
+PropEdge V12.0 — BATCH 3: PREDICT
+  Date: 2026-04-04 | 2026-04-04 21:32 UTC+01:00
+============================================================
+
+  Fetching props: 2026-04-04 (B3)
+    Credits: 18514 events
+    3 games
+    Credits: 18508 
+    ✓ WAS @ MIA: 11 props
+    Credits: 18502 
+    ✓ SAS @ DEN: 14 props
+    Credits: 18499 
+    ✓ DET @ PHI: 13 props
+  Total: 38 props, 3 games
+  ✓ Excel: Player_Points_Props 16,559→16,562 (+3) | Spreads 1,412→1,412 (+0)
+
+  Running V12.0 predictions...
+    Building caches...
+    ✓ V11 direction classifier
+  37 predictions (32 conviction + 5 leans, 1 skipped)
+    Skips: 1 no_player
+
+  ✓ today.json: 42 plays (9 T1, 3 T2) | Added:3 Updated:34 Preserved:5
+  ✓ Git push: B3: 2026-04-04 — 37 plays
