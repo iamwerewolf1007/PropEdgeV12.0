@@ -346,3 +346,62 @@ PropEdge V12.0 — BATCH 0: GRADE + UPDATE
     Top  50%: acc=0.7586  n=22,422  min_gap=1.92pt
   ✓ Git push: B0: grade 2026-04-05
   ✓ BATCH 0 complete
+============================================================
+PropEdge V12.0 — BATCH 0: GRADE + UPDATE
+  2026-04-07 06:14 UTC+01:00
+============================================================
+  Grading: 2026-04-06
+
+  Fetching box scores: 2026-04-06...
+    5 games
+    ✗ game 0022501143: ('Connection aborted.', ConnectionResetError(54, 'Connection reset by peer'))
+  Fetched 83 played rows, 110 players in box
+  ✓ Graded 46: 27W/19L, 19 DNP
+  ✓ Game logs: 25313 → 25415 (+83 played, +19 DNP stubs)
+  ✓ Rolling update 2026-04-06: 46 refreshed, 19 DNP skipped, 0 insufficient history, 0 errors
+
+  Cross-checking rolling stats for 2026-04-06...
+  ✓ Cross-check: all rolling stats consistent for 2026-04-06
+
+  Rebuilding H2H...
+  ✓ H2H: 15647 pairs → h2h_database.csv
+  Retraining V12.0 models...
+    Building training data...
+    Played rows: 51,008   Players: 634
+    Computing vectorised rolling features...
+    After sequence filter: 44,919
+    Real bookmaker lines merged: 14,096/44,919 rows (31.4%)
+    Final training samples: 44,919
+    Training LightGBM direction classifier...
+    Computing OOF predictions for calibration (5-fold)...
+    ✓ direction_classifier.pkl
+    OOF direction accuracy: 0.6551
+    OOF Brier score:        0.2428  (0.25 = random)
+    OOF ROC-AUC:            0.6736
+    OOF accuracy at top 40%: 0.7257  (target: 0.800)
+    ✓ calibrator.pkl  (OOF-fitted — Brier=0.2428)
+    Training GBR Huber regressor (point projection)...
+    GBR trees: 300
+    ✓ projection_model.pkl
+    Building segment model wrapper...
+    Segment 'role': 34,614 rows  trees=200
+    Segment 'rotational': 7,133 rows  trees=200
+    Segment 'star': 3,172 rows  trees=200
+    ✓ segment_model.pkl
+    Training quantile GBR (P25 + P75)...
+    ✓ quantile_models.pkl
+    ✓ player_trust.json (550 players — OOF-based)
+
+    === OOF ACCURACY AT CONVICTION THRESHOLDS ===
+    (conviction = |pred_pts - line| from regression model)
+    (direction  = classifier OOF probability >= 0.5)
+    Top   5%: acc=0.8624  n=2,246  min_gap=6.25pt
+    Top  10%: acc=0.8362  n=4,492  min_gap=4.98pt
+    Top  15%: acc=0.8289  n=6,738  min_gap=4.22pt
+    Top  20%: acc=0.8186  n=8,984  min_gap=3.72pt
+    Top  25%: acc=0.8102  n=11,230  min_gap=3.32pt
+    Top  30%: acc=0.7984  n=13,476  min_gap=2.99pt
+    Top  40%: acc=0.7773  n=17,968  min_gap=2.41pt ← TARGET
+    Top  50%: acc=0.7564  n=22,460  min_gap=1.91pt
+  ✓ Git push: B0: grade 2026-04-06
+  ✓ BATCH 0 complete
