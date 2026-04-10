@@ -360,3 +360,10 @@ ts,batch,event,file,rows_before,rows_after,detail
 2026-04-10 10:41:05,B2,PREDICTIONS,,,,77 plays
 2026-04-10 10:41:06,B2,BATCH_SUMMARY,,,,"props_fetched=77, plays_added=0"
 2026-04-10 10:41:06,B2,INTEGRITY_OK,/Users/salman/Documents/GitHub/PropEdgeV12.0/data/today.json,997,997,SAVE_TODAY
+2026-04-10 10:41:10,B2,BATCH_COMPLETE,,,,
+2026-04-10 16:04:06,B2,BATCH_START,,,,2026-04-10
+2026-04-10 16:04:17,B2,PROPS_FETCHED,,,,110 props
+2026-04-10 16:04:38,B2,EXCEL_UPDATED,,,,props=17161 spreads=1466
+2026-04-10 16:05:05,B2,PREDICTIONS,,,,110 plays
+2026-04-10 16:05:06,B2,BATCH_SUMMARY,,,,"props_fetched=110, plays_added=36"
+2026-04-10 16:05:06,B2,INTEGRITY_OK,/Users/salman/Documents/GitHub/PropEdgeV12.0/data/today.json,997,1033,SAVE_TODAY
